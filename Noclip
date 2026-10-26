@@ -1,0 +1,110 @@
+print("SPEED + JUMP + NOCLIP")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local pg = LocalPlayer:WaitForChild("PlayerGui")
+
+if pg:FindFirstChild("TesMini") then
+    pg.TesMini:Destroy()
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "TesMini"
+gui.ResetOnSpawn = false
+gui.Parent = pg
+
+-- Label
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(0, 260, 0, 38)
+label.Position = UDim2.new(0.5, -130, 0.18, 0)
+label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+label.Text = "SPEED + JUMP + NOCLIP"
+label.TextColor3 = Color3.fromRGB(0, 255, 0)
+label.TextScaled = true
+label.Font = Enum.Font.GothamBold
+label.Parent = gui
+
+-- Tombol
+local function CreateButton(text, y)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 150, 0, 40)
+    btn.Position = UDim2.new(0.5, -75, y, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.Text = text .. ": OFF"
+    btn.TextColor3 = Color3.fromRGB(255, 80, 80)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.Parent = gui
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    return btn
+end
+
+local btnSpeed = CreateButton("Speed", 0.30)
+local btnJump  = CreateButton("Jump", 0.42)
+local btnNoclip = CreateButton("Noclip", 0.54)
+
+local speedOn = false
+local jumpOn = false
+local noclipOn = false
+local OriginalCanCollide = {}
+
+btnSpeed.MouseButton1Click:Connect(function()
+    speedOn = not speedOn
+    btnSpeed.Text = speedOn and "Speed: ON" or "Speed: OFF"
+    btnSpeed.TextColor3 = speedOn and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+end)
+
+btnJump.MouseButton1Click:Connect(function()
+    jumpOn = not jumpOn
+    btnJump.Text = jumpOn and "Jump: ON" or "Jump: OFF"
+    btnJump.TextColor3 = jumpOn and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+end)
+
+btnNoclip.MouseButton1Click:Connect(function()
+    noclipOn = not noclipOn
+    btnNoclip.Text = noclipOn and "Noclip: ON" or "Noclip: OFF"
+    btnNoclip.TextColor3 = noclipOn and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+end)
+
+-- Loop utama
+RunService.RenderStepped:Connect(function()
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hum = char:FindFirstChild("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not hum then return end
+
+    -- Speed
+    hum.WalkSpeed = speedOn and 70 or 16
+
+    -- Jump
+    if jumpOn then
+        hum.JumpPower = 120
+        hum.JumpHeight = 20
+    else
+        hum.JumpPower = 50
+        hum.JumpHeight = 7.2
+    end
+
+    -- Noclip
+    if root then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                if noclipOn then
+                    if OriginalCanCollide[part] == nil then
+                        OriginalCanCollide[part] = part.CanCollide
+                    end
+                    part.CanCollide = false
+                else
+                    if OriginalCanCollide[part] \~= nil then
+                        part.CanCollide = OriginalCanCollide[part]
+                        OriginalCanCollide[part] = nil
+                    end
+                end
+            end
+        end
+    end
+end)
+
+print("Speed + Jump + Noclip siap")
