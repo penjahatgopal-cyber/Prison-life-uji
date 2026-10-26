@@ -1,0 +1,78 @@
+print("HALO + SPEED + JUMP")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local pg = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Hapus lama
+if pg:FindFirstChild("TesMini") then
+    pg.TesMini:Destroy()
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "TesMini"
+gui.ResetOnSpawn = false
+gui.Parent = pg
+
+-- Label
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(0, 240, 0, 45)
+label.Position = UDim2.new(0.5, -120, 0.22, 0)
+label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+label.Text = "SPEED + JUMP"
+label.TextColor3 = Color3.fromRGB(0, 255, 0)
+label.TextScaled = true
+label.Font = Enum.Font.GothamBold
+label.Parent = gui
+
+-- Tombol Speed
+local btnSpeed = Instance.new("TextButton")
+btnSpeed.Size = UDim2.new(0, 150, 0, 42)
+btnSpeed.Position = UDim2.new(0.5, -75, 0.35, 0)
+btnSpeed.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+btnSpeed.Text = "Speed: OFF"
+btnSpeed.TextColor3 = Color3.fromRGB(255, 80, 80)
+btnSpeed.Font = Enum.Font.GothamBold
+btnSpeed.TextSize = 15
+btnSpeed.Parent = gui
+Instance.new("UICorner", btnSpeed).CornerRadius = UDim.new(0, 8)
+
+-- Tombol Jump
+local btnJump = Instance.new("TextButton")
+btnJump.Size = UDim2.new(0, 150, 0, 42)
+btnJump.Position = UDim2.new(0.5, -75, 0.48, 0)
+btnJump.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+btnJump.Text = "Jump: OFF"
+btnJump.TextColor3 = Color3.fromRGB(255, 80, 80)
+btnJump.Font = Enum.Font.GothamBold
+btnJump.TextSize = 15
+btnJump.Parent = gui
+Instance.new("UICorner", btnJump).CornerRadius = UDim.new(0, 8)
+
+local speedOn = false
+local jumpOn = false
+
+btnSpeed.MouseButton1Click:Connect(function()
+    speedOn = not speedOn
+    btnSpeed.Text = speedOn and "Speed: ON" or "Speed: OFF"
+    btnSpeed.TextColor3 = speedOn and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+end)
+
+btnJump.MouseButton1Click:Connect(function()
+    jumpOn = not jumpOn
+    btnJump.Text = jumpOn and "Jump: ON" or "Jump: OFF"
+    btnJump.TextColor3 = jumpOn and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+end)
+
+-- Loop
+RunService.Stepped:Connect(function()
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        local hum = char.Humanoid
+        hum.WalkSpeed = speedOn and 50 or 16
+        hum.JumpPower = jumpOn and 90 or 50
+    end
+end)
+
+print("Speed + Jump siap")
