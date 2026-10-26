@@ -1,0 +1,20 @@
+print("HALO DARI SCRIPT")
+
+local player = game.Players.LocalPlayer
+local pg = player:WaitForChild("PlayerGui")
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "TesMini"
+gui.Parent = pg
+
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(0, 250, 0, 60)
+label.Position = UDim2.new(0.5, -125, 0.3, 0)
+label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+label.Text = "SCRIPT JALAN!"
+label.TextColor3 = Color3.fromRGB(0, 255, 0)
+label.TextScaled = true
+label.Font = Enum.Font.GothamBold
+label.Parent = gui
+
+print("GUI DIBUAT")
