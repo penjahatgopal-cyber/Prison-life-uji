@@ -1,0 +1,162 @@
+-- Prison Life Minimal (HP Test)
+-- Hanya fitur dasar yang paling mungkin jalan
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+print("[Minimal] Script mulai...")
+
+local Settings = {
+    Speed = false,
+    Jump = false,
+    Noclip = false,
+    ESP = true,
+    WalkSpeed = 50,
+    JumpPower = 80,
+}
+
+local OriginalCanCollide = {}
+local ESPFolder = {}
+
+-- ==================== GUI ====================
+local pg = LocalPlayer:WaitForChild("PlayerGui")
+
+if pg:FindFirstChild("PrisonMinimal") then
+    pg.PrisonMinimal:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PrisonMinimal"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = pg
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 170, 0, 220)
+Main.Position = UDim2.new(0, 15, 0.4, 0)
+Main.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Main.Parent = ScreenGui
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 28)
+Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Title.Text = "Prison Minimal"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 13
+Title.Parent = Main
+Instance.new("UICorner", Title).CornerRadius = UDim.new(0, 8)
+
+local function MakeBtn(text, key, y)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0.9, 0, 0, 30)
+    b.Position = UDim2.new(0.05, 0, 0, y)
+    b.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    b.Text = text .. ": OFF"
+    b.TextColor3 = Color3.fromRGB(255, 80, 80)
+    b.Font = Enum.Font.Gotham
+    b.TextSize = 13
+    b.Parent = Main
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+
+    b.MouseButton1Click:Connect(function()
+        Settings[key] = not Settings[key]
+        if Settings[key] then
+            b.Text = text .. ": ON"
+            b.TextColor3 = Color3.fromRGB(80, 255, 80)
+        else
+            b.Text = text .. ": OFF"
+            b.TextColor3 = Color3.fromRGB(255, 80, 80)
+        end
+        print(text, "=", Settings[key])
+    end)
+end
+
+MakeBtn("Speed", "Speed", 40)
+MakeBtn("Jump Tinggi", "Jump", 80)
+MakeBtn("Noclip", "Noclip", 120)
+MakeBtn("ESP", "ESP", 160)
+
+print("[Minimal] GUI dibuat")
+
+-- ==================== LOOP ====================
+RunService.Stepped:Connect(function()
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hum = char:FindFirstChild("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not hum then return end
+
+    -- Speed
+    hum.WalkSpeed = Settings.Speed and Settings.WalkSpeed or 16
+
+    -- Jump
+    hum.JumpPower = Settings.Jump and Settings.JumpPower or 50
+
+    -- Noclip
+    if root then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                if Settings.Noclip then
+                    if OriginalCanCollide[part] == nil then
+                        OriginalCanCollide[part] = part.CanCollide
+                    end
+                    part.CanCollide = false
+                else
+                    if OriginalCanCollide[part] \~= nil then
+                        part.CanCollide = OriginalCanCollide[part]
+                        OriginalCanCollide[part] = nil
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- ==================== ESP SEDERHANA ====================
+local function CreateESP(plr)
+    if plr == LocalPlayer or ESPFolder[plr] then return end
+
+    local hl = Instance.new("Highlight")
+    hl.FillColor = Color3.fromRGB(255, 60, 60)
+    hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+    hl.FillTransparency = 0.6
+    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    hl.Parent = plr.Character or plr
+
+    ESPFolder[plr] = hl
+
+    -- Update terus
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        if not Settings.ESP or not plr.Parent then
+            if hl then hl:Destroy() end
+            ESPFolder[plr] = nil
+            if conn then conn:Disconnect() end
+            return
+        end
+
+        if plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health > 0 then
+            hl.Adornee = plr.Character
+            hl.Enabled = true
+        else
+            hl.Adornee = nil
+        end
+    end)
+end
+
+for _, p in pairs(Players:GetPlayers()) do
+    task.spawn(function()
+        task.wait(0.5)
+        CreateESP(p)
+    end)
+end
+
+Players.PlayerAdded:Connect(function(p)
+    task.wait(1)
+    CreateESP(p)
+end)
+
+print("[Minimal] Script siap. Coba nyalain Speed / Jump / Noclip")
