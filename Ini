@@ -1,0 +1,86 @@
+print("SPEED + JUMP (LEBIH KUAT)")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local pg = LocalPlayer:WaitForChild("PlayerGui")
+
+if pg:FindFirstChild("TesMini") then
+    pg.TesMini:Destroy()
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "TesMini"
+gui.ResetOnSpawn = false
+gui.Parent = pg
+
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(0, 250, 0, 40)
+label.Position = UDim2.new(0.5, -125, 0.20, 0)
+label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+label.Text = "SPEED + JUMP KUAT"
+label.TextColor3 = Color3.fromRGB(0, 255, 0)
+label.TextScaled = true
+label.Font = Enum.Font.GothamBold
+label.Parent = gui
+
+local btnSpeed = Instance.new("TextButton")
+btnSpeed.Size = UDim2.new(0, 150, 0, 42)
+btnSpeed.Position = UDim2.new(0.5, -75, 0.33, 0)
+btnSpeed.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+btnSpeed.Text = "Speed: OFF"
+btnSpeed.TextColor3 = Color3.fromRGB(255, 80, 80)
+btnSpeed.Font = Enum.Font.GothamBold
+btnSpeed.TextSize = 15
+btnSpeed.Parent = gui
+Instance.new("UICorner", btnSpeed).CornerRadius = UDim.new(0, 8)
+
+local btnJump = Instance.new("TextButton")
+btnJump.Size = UDim2.new(0, 150, 0, 42)
+btnJump.Position = UDim2.new(0.5, -75, 0.46, 0)
+btnJump.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+btnJump.Text = "Jump: OFF"
+btnJump.TextColor3 = Color3.fromRGB(255, 80, 80)
+btnJump.Font = Enum.Font.GothamBold
+btnJump.TextSize = 15
+btnJump.Parent = gui
+Instance.new("UICorner", btnJump).CornerRadius = UDim.new(0, 8)
+
+local speedOn = false
+local jumpOn = false
+
+btnSpeed.MouseButton1Click:Connect(function()
+    speedOn = not speedOn
+    btnSpeed.Text = speedOn and "Speed: ON" or "Speed: OFF"
+    btnSpeed.TextColor3 = speedOn and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+end)
+
+btnJump.MouseButton1Click:Connect(function()
+    jumpOn = not jumpOn
+    btnJump.Text = jumpOn and "Jump: ON" or "Jump: OFF"
+    btnJump.TextColor3 = jumpOn and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+end)
+
+-- Loop lebih agresif
+RunService.RenderStepped:Connect(function()
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        local hum = char.Humanoid
+        
+        if speedOn then
+            hum.WalkSpeed = 70          -- lebih kenceng
+        else
+            hum.WalkSpeed = 16
+        end
+        
+        if jumpOn then
+            hum.JumpPower = 120         -- lebih tinggi
+            hum.JumpHeight = 20         -- tambahan buat game baru
+        else
+            hum.JumpPower = 50
+            hum.JumpHeight = 7.2
+        end
+    end
+end)
+
+print("Versi lebih kuat siap")
